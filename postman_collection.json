@@ -1,0 +1,902 @@
+{
+  "info": {
+    "name": "College ERP Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "ACCESS_TOKEN",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"securepassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/login",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"user\": {\n            \"id\": \"60f1c...\",\n            \"name\": \"System Admin\",\n            \"email\": \"admin@college.edu\",\n            \"role\": \"ADMIN\"\n        },\n        \"token\": \"ey...\"\n    }\n}"
+            },
+            {
+              "name": "Error (Invalid Credentials)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/login",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"error\": \"Invalid credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"teacher.john@college.edu\",\n  \"password\": \"password123\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/register",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile (Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/auth/me",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Create Student",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane.smith@student.college.edu\",\n  \"password\": \"changeme123\",\n  \"rollNumber\": \"CS2023-001\",\n  \"academicYear\": \"2023-2024\",\n  \"departmentId\": \"DEPT-CS\",\n  \"classId\": \"65c2a...\",\n  \"contactNumber\": \"+1234567890\",\n  \"address\": \"123 Campus Residence\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/students",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "students"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane.smith@student.college.edu\",\n  \"password\": \"changeme123\",\n  \"rollNumber\": \"CS2023-001\",\n  \"academicYear\": \"2023-2024\",\n  \"departmentId\": \"DEPT-CS\",\n  \"classId\": \"65c2a...\",\n  \"contactNumber\": \"+1234567890\",\n  \"address\": \"123 Campus Residence\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/students",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "students"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"_id\": \"...\",\n        \"rollNumber\": \"CS2023-001\",\n        \"userId\": \"...\",\n        \"status\": \"ACTIVE\"\n    },\n    \"message\": \"Student created successfully\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Students",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/students?page=1&limit=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Student",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/students/:id",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "students",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "65c2a8f9..."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"+0987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/students/:id",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "students",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "65c2a8f9..."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Archive Student (Soft Delete)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/students/:id",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "students",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "65c2a8f9..."
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Classes",
+      "item": [
+        {
+          "name": "Get All Classes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/classes",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "classes"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Start Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classId\": \"65d9f1...\",\n  \"subjectId\": \"CS101\",\n  \"date\": \"2024-03-01T10:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/attendance/session/start",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "attendance",
+                "session",
+                "start"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"65ea2...\",\n  \"studentId\": \"65c2a...\",\n  \"confidenceScore\": 0.98,\n  \"status\": \"PRESENT\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/attendance/mark",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "attendance",
+                "mark"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sessionId\": \"65ea2...\",\n  \"studentId\": \"65c2a...\",\n  \"confidenceScore\": 0.98,\n  \"status\": \"PRESENT\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/attendance/mark",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "attendance",
+                    "mark"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": {\n        \"_id\": \"...\",\n        \"sessionId\": \"65ea2...\",\n        \"studentId\": \"65c2a...\",\n        \"status\": \"PRESENT\",\n        \"markedBy\": \"FACIAL\"\n    },\n    \"message\": \"Attendance marked successfully\"\n}"
+            },
+            {
+              "name": "Duplicate Prevented",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sessionId\": \"65ea2...\",\n  \"studentId\": \"65c2a...\",\n  \"confidenceScore\": 0.98,\n  \"status\": \"PRESENT\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/attendance/mark",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "attendance",
+                    "mark"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": null,\n    \"message\": \"Attendance already logged for this student in this session\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "End Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"65ea2...\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/attendance/session/end",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "attendance",
+                "session",
+                "end"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/attendance/student/:studentId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "attendance",
+                "student",
+                ":studentId"
+              ],
+              "variable": [
+                {
+                  "key": "studentId",
+                  "value": "65c2a8f9..."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Class Attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/attendance/class/:classId?date=2024-03-01",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "attendance",
+                "class",
+                ":classId"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-03-01",
+                  "description": "Optional date filter"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "classId",
+                  "value": "65d9f1..."
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Fees",
+      "item": [
+        {
+          "name": "Create Fee Structure",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Term 1 Tuition Fee\",\n  \"classId\": \"65d9f1...\",\n  \"amount\": 500000,\n  \"dueDate\": \"2024-09-01T00:00:00.000Z\",\n  \"academicYear\": \"2023-2024\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/fees/structure",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "fees",
+                "structure"
+              ]
+            },
+            "description": "Amount is stored in smallest currency unit (e.g. cents)"
+          },
+          "response": []
+        },
+        {
+          "name": "Log Payment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"structureId\": \"65fb3...\",\n  \"studentId\": \"65c2a...\",\n  \"amount\": 250000,\n  \"method\": \"BANK_TRANSFER\",\n  \"transactionId\": \"TRX-987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/fees/pay",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "fees",
+                "pay"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Dues",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/fees/student/:studentId",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "fees",
+                "student",
+                ":studentId"
+              ],
+              "variable": [
+                {
+                  "key": "studentId",
+                  "value": "65c2a8f9..."
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Global Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/fees/summary",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "fees",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Admin Dashboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard/admin",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teacher Dashboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard/teacher",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "teacher"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Student Dashboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard/student",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "student"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
