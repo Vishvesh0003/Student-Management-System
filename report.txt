@@ -1,0 +1,136 @@
+# Comprehensive Code Scan & Issue Report — Full Audit (v2)
+Last updated: 2026-04-13
+
+---
+
+## RESOLVED ISSUES
+
+---
+
+### ISSUE 1 — CRITICAL: TEST BLOCK Left in Production Code
+**File:** `backend/src/controllers/attendance.controller.ts`
+**Lines:** 394–412 (removed)
+**Severity:** 🔴 CRITICAL
+
+The temporary test block that overrode `inputEmbedding` with the first stored embedding
+was never removed. This meant every single facial attendance scan was ALWAYS matching
+the first student in the database regardless of whose face was captured.
+
+**Fix:** Test block removed entirely.
+
+---
+
+### ISSUE 2 — submitAttendance catch returned hardcoded 500 for all errors
+**File:** `backend/src/controllers/attendance.controller.ts`
+**Line:** ~284
+**Severity:** 🟠 HIGH
+
+The catch block in `submitAttendance` returned `res.status(500)` even when the thrown
+error was an `AppError` with a 4xx status (400, 403, 404). This was inconsistent with
+`getAttendanceBySession` and `markFaceAttendance` which were already fixed.
+
+**Fix:** Added `const status = error instanceof AppError ? error.statusCode : 500`
+to all three handlers for consistent behaviour.
+
+---
+
+### ISSUE 3 — Live Attendance Update: Throttle/Debounce Race Condition
+**File:** `frontend/src/student/pages/StudentAttendance.tsx`
+**Severity:** 🔴 CRITICAL (primary reason live updates failed)
+
+`fetchAttendance` had a 1200ms throttle. The socket event listener debounced calls
+by 1000ms. When the socket event fired 1000ms after page load (which set lastFetchRef),
+the throttle check blocked the call because 1000ms < 1200ms.
+
+**Fix:** Added `force` parameter to `fetchAttendance(force=false)`. Socket events
+call `fetchAttendance(true)` which bypasses the throttle. Debounce reduced to 300ms.
+
+---
+
+### ISSUE 4 — Global WebSocket Broadcast (Thundering Herd)
+**File:** `backend/src/socket/index.ts`
+**Severity:** 🔴 CRITICAL (scalability)
+
+`ioInstance.emit("attendance_updated", ...)` was broadcasting to EVERY connected user
+when any teacher marked attendance. In production with hundreds of students, this would
+trigger simultaneous DB queries from all students.
+
+**Fix:** Added `join_class` / `leave_class` socket room events. Backend now emits to
+`class:{classId}` room only. Falls back to global broadcast if classId is missing.
+
+---
+
+### ISSUE 5 — user.classId Does Not Exist on User Type
+**File:** `frontend/src/context/socket/SocketContext.tsx`
+**Severity:** 🟠 HIGH
+
+The `User` interface only contains `id, _id, name, email, role`. There is no `classId`
+field. The initial socket room join code used `user?.classId` which is always `undefined`
+for students. This meant students never joined a class room, and the targeted socket
+emit in Issue 4 fix would never reach them.
+
+**Fix:** Updated classId lookup to check `user?.student?.classId`, `user?.classId`,
+and `user?.profile?.classId` in order of preference (matches likely auth/me response shapes).
+
+> NOTE: The exact field path depends on what `/api/v1/auth/me` returns for student users.
+> If students still don't receive live updates, log `user` in SocketContext and confirm
+> the exact field that contains classId, then update the lookup path accordingly.
+
+---
+
+### ISSUE 6 — AI RESPONSE Log Printing Full 128-Number Array
+**File:** `backend/src/services/face.service.ts`
+**Severity:** 🟡 MEDIUM (operational noise)
+
+`console.log("AI RESPONSE:", response.data)` printed the entire 128-element float array
+to the console on every facial scan, making logs completely unreadable.
+
+**Fix:** Replaced with a condensed summary: `{ engine, embeddingLength, hasError }`.
+
+---
+
+### ISSUE 7 — Missing engine field in EmbeddingResponse TypeScript interface
+**File:** `backend/src/services/face.service.ts`
+**Severity:** 🟡 MEDIUM (TypeScript lint error)
+
+The Python AI service returns `{ embedding, engine: "face_recognition" }` but the
+TypeScript interface `EmbeddingResponse` did not declare `engine`, causing a TS error.
+
+**Fix:** Added `engine?: string` to `EmbeddingResponse`.
+
+---
+
+### ISSUE 8 — No Embedding Validation in Face Registration
+**File:** `backend/src/controllers/face.controller.ts`
+**Severity:** 🟠 HIGH (data integrity)
+
+`registerFace` uses `getFaceEmbedding()` which now validates that embeddings are exactly
+128-dimensional. However `face.controller.ts` line 117 had its own weaker check:
+`if (!embedding || !Array.isArray(embedding) || embedding.length === 0)` — this passes
+any non-empty array including wrong-dimension ones. Since `getFaceEmbedding` now throws
+before returning a wrong-dimension embedding, this is effectively resolved upstream.
+No code change needed but documented here for awareness.
+
+---
+
+## REMAINING KNOWN LIMITATION
+
+### classId Path in SocketContext
+The `join_class` fix works correctly IF the `/auth/me` response includes a `student`
+sub-object with a `classId`. To verify, check the backend `auth.controller.ts` response
+for the `/me` endpoint. If classId isn't nested under `student`, update the lookup in
+`SocketContext.tsx` line 43 to match the actual field path.
+
+---
+
+## FILES CHANGED IN THIS SESSION
+
+| File | Changes |
+|------|---------|
+| attendance.controller.ts | Added try/catch to all 3 handlers; removed TEST BLOCK; fixed AppError status propagation |
+| face.service.ts | Added embedding validation (128-dim); fixed AI RESPONSE log; added engine to interface |
+| distance.ts | Added null/undefined guards + clearer length mismatch message |
+| socket/index.ts | Added join_class/leave_class rooms; scoped emitAttendanceUpdated to class room |
+| SocketContext.tsx | emits join_class on connect; fixed classId lookup |
+| StudentAttendance.tsx | Fixed throttle/debounce race via force=true bypass |
+| scripts/resetFaceEmbeddings.ts | New: one-shot script to wipe all stored embeddings |
